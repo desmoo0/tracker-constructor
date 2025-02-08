@@ -3,6 +3,7 @@ package task;
 import java.util.Objects;
 
 public class Task {
+    
     protected String name;
     protected String description;
     protected int id;
@@ -13,6 +14,7 @@ public class Task {
         this.description = description;
         this.status = TaskStatus.NEW;
     }
+    
     public String getName() {
         return name;
     }
