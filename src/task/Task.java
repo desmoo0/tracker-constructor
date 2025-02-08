@@ -69,4 +69,11 @@ public class Task {
                 ", status=" + status +
                 '}';
     }
+
+    public Task copy() {
+        Task copy = new Task(this.name, this.description);
+        copy.setId(this.id);
+        copy.setStatus(this.status);
+        return copy;
+    }
 }
