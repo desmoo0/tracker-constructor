@@ -23,6 +23,7 @@ public class Epic extends Task {
         subtaskIds.remove(subtaskId);
     }
 
+    // Переопределим метод, и для удобства - названия переменных будем писать на английском
     @Override
     public String toString() {
         return "Epic{" +
@@ -32,14 +33,5 @@ public class Epic extends Task {
                 ", status=" + status +
                 ", subtaskIds=" + subtaskIds +
                 '}';
-    }
-
-    @Override
-    public Epic copy() {
-        Epic copy = new Epic(this.name, this.description);
-        copy.setId(this.id);
-        copy.setStatus(this.status);
-        copy.getSubtaskIds().addAll(this.subtaskIds);
-        return copy;
     }
 }
