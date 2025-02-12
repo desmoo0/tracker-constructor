@@ -39,18 +39,6 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldLimitHistoryTo10Tasks() {
-        for (int i = 0; i < 15; i++) {
-            Task task = new Task("Задача " + i, "Описание: " + i);
-            taskManager.createTask(task);
-            taskManager.getTaskById(task.getId());
-        }
-
-        List<Task> history = taskManager.getHistory();
-        assertEquals(10, history.size(), "История должна содержать максимум 10 задач");
-    }
-
-    @Test
     void historyManagerTest() {
         Task task = new Task("Тестовое задание", "Погладить собаку");
         taskManager.createTask(task);
@@ -138,17 +126,11 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldPreserveHistoryData() {
-        // Создаем задачу
         Task task = new Task("Задача", "Очень важная задача");
         taskManager.createTask(task);
 
         // Получаем задачу первый раз (добавится в историю)
         Task firstView = taskManager.getTaskById(task.getId());
-
-        // Создаем копию для сравнения
-        Task expectedTask = new Task(firstView.getName(), firstView.getDescription());
-        expectedTask.setId(firstView.getId());
-        expectedTask.setStatus(firstView.getStatus());
 
         // Изменяем оригинальную задачу
         task.setStatus(TaskStatus.IN_PROGRESS);
@@ -157,12 +139,75 @@ class InMemoryTaskManagerTest {
         // Получаем задачу из истории
         Task historyTask = taskManager.getHistory().get(0);
 
-        // Сравниваем с сохраненной копией
-        assertEquals(expectedTask.getStatus(), historyTask.getStatus(),
-                "В истории должна сохраниться начальная версия задачи");
-        assertEquals(expectedTask.getName(), historyTask.getName(),
-                "Имя задачи в истории не должно измениться");
-        assertEquals(expectedTask.getDescription(), historyTask.getDescription(),
-                "Описание задачи в истории не должно измениться");
+        // Проверяем, что история сохранила исходное состояние
+        assertEquals(TaskStatus.NEW, historyTask.getStatus(), "Статус в истории должен остаться NEW");
+    }
+
+    @Test
+    void epicShouldNotHaveDeletedSubtaskIds() {
+        Epic epic = new Epic("Эпик", "Переезд");
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача", "Упаковать вещи", epic.getId());
+        taskManager.createSubtask(subtask);
+
+        taskManager.deleteSubtaskById(subtask.getId());
+        Epic savedEpic = taskManager.getEpicById(epic.getId());
+
+        assertFalse(savedEpic.getSubtaskIds().contains(subtask.getId()), "Эпик содержит удалённую подзадачу");
+    }
+
+    @Test
+    void subtaskShouldNotReferenceDeletedEpic() {
+        Epic epic = new Epic("Эпик", "Переезд");
+        taskManager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача", "Упаковать вещи", epic.getId());
+        taskManager.createSubtask(subtask);
+
+        taskManager.deleteEpicById(epic.getId());
+        Subtask savedSubtask = taskManager.getSubtaskById(subtask.getId());
+
+        assertNull(savedSubtask, "Подзадача не удалилась вместе с эпиком");
+    }
+
+    @Test
+    void taskUpdateShouldAffectManager() {
+        Task task = new Task("Задача", "Изначальное описание");
+        taskManager.createTask(task);
+
+        task.setDescription("Новое описание");
+        taskManager.updateTask(task); //
+
+        Task savedTask = taskManager.getTaskById(task.getId());
+        assertEquals("Новое описание", savedTask.getDescription());
+    }
+
+    @Test
+    void changingTaskIdBreaksManager() {
+        Task task = new Task("Задача", "Описание");
+        taskManager.createTask(task);
+        int originalId = task.getId();
+
+        task.setId(999); // Проверяем на наличие предела
+
+        assertNull(taskManager.getTaskById(999), "Менеджер не должен находить задачу по новому ID");
+        assertNotNull(taskManager.getTaskById(originalId), "Оригинальная задача потерялась");
+    }
+
+    @Test
+    void getHistoryReturnsImmutableCopy() {
+        Task task = new Task("Задача", "Тест");
+        taskManager.createTask(task);
+        taskManager.getTaskById(task.getId());
+
+        List<Task> history = taskManager.getHistory();
+        history.clear(); // Попытка изменить копию
+
+        assertFalse(taskManager.getHistory().isEmpty(), "Оригинальная история не должна измениться");
+    }
+
+    @Test
+    void nonExistentTaskDeletion() {
+        taskManager.deleteTaskById(999); // Нет такой задачи
+        // Ожидается, что исключений не будет
     }
 }
