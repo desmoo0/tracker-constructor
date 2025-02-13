@@ -145,7 +145,7 @@ class FileBackedTaskManagerTest {
 
     @Test
     void shouldCorrectlyLoadDataFromFile() {
-        // Создаем задачи разных типов
+        // Создаем и сохраняем начальное состояние
         Task task = new Task("Задача", "Описание задачи");
         Epic epic = new Epic("Эпик", "Описание эпика");
         manager.createTask(task);
@@ -167,25 +167,43 @@ class FileBackedTaskManagerTest {
         // Загружаем данные в новый менеджер
         FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
 
-        // Проверяем корректность загрузки задач
-        assertEquals(task, loadedManager.getTaskById(task.getId()));
-        assertEquals(epic, loadedManager.getEpicById(epic.getId()));
-        assertEquals(subtask, loadedManager.getSubtaskById(subtask.getId()));
+        // Проверяем количество задач каждого типа
+        assertEquals(1, loadedManager.getAllTasks().size(), "Неверное количество задач");
+        assertEquals(1, loadedManager.getAllEpics().size(), "Неверное количество эпиков");
+        assertEquals(1, loadedManager.getAllSubtasks().size(), "Неверное количество подзадач");
 
-        // Проверяем статусы
-        assertEquals(TaskStatus.IN_PROGRESS, loadedManager.getTaskById(task.getId()).getStatus());
-        assertEquals(TaskStatus.DONE, loadedManager.getSubtaskById(subtask.getId()).getStatus());
+        // Проверяем соответствие загруженных задач
+        Task loadedTask = loadedManager.getTaskById(task.getId());
+        Epic loadedEpic = loadedManager.getEpicById(epic.getId());
+        Subtask loadedSubtask = loadedManager.getSubtaskById(subtask.getId());
+
+        // Проверяем данные задач
+        assertNotNull(loadedTask, "Задача не загружена");
+        assertEquals(task.getName(), loadedTask.getName(), "Имена задач не совпадают");
+        assertEquals(task.getDescription(), loadedTask.getDescription(), "Описания задач не совпадают");
+        assertEquals(task.getStatus(), loadedTask.getStatus(), "Статусы задач не совпадают");
+
+        // Проверяем данные эпика
+        assertNotNull(loadedEpic, "Эпик не загружен");
+        assertEquals(epic.getName(), loadedEpic.getName(), "Имена эпиков не совпадают");
+        assertEquals(epic.getDescription(), loadedEpic.getDescription(), "Описания эпиков не совпадают");
+
+        // Проверяем данные подзадачи
+        assertNotNull(loadedSubtask, "Подзадача не загружена");
+        assertEquals(subtask.getName(), loadedSubtask.getName(), "Имена подзадач не совпадают");
+        assertEquals(subtask.getDescription(), loadedSubtask.getDescription(), "Описания подзадач не совпадают");
+        assertEquals(subtask.getStatus(), loadedSubtask.getStatus(), "Статусы подзадач не совпадают");
+        assertEquals(subtask.getEpicId(), loadedSubtask.getEpicId(), "ID эпиков подзадач не совпадают");
 
         // Проверяем историю
         List<Task> history = loadedManager.getHistory();
-        assertEquals(3, history.size());
-        assertEquals(task.getId(), history.get(0).getId());
-        assertEquals(epic.getId(), history.get(1).getId());
-        assertEquals(subtask.getId(), history.get(2).getId());
+        assertEquals(3, history.size(), "Неверное количество записей в истории");
+        assertEquals(task.getId(), history.get(0).getId(), "Неверный порядок в истории: задача");
+        assertEquals(epic.getId(), history.get(1).getId(), "Неверный порядок в истории: эпик");
+        assertEquals(subtask.getId(), history.get(2).getId(), "Неверный порядок в истории: подзадача");
 
-        // Проверяем связи между эпиком и подзадачами
-        Epic loadedEpic = loadedManager.getEpicById(epic.getId());
-        assertTrue(loadedEpic.getSubtaskIds().contains(subtask.getId()));
-        assertEquals(epic.getId(), loadedManager.getSubtaskById(subtask.getId()).getEpicId());
+        // Проверяем связь эпика с подзадачей
+        assertTrue(loadedEpic.getSubtaskIds().contains(subtask.getId()),
+                "Эпик не содержит ссылку на подзадачу");
     }
 }
