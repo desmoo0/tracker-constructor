@@ -33,9 +33,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
             // Сохраняем историю
             writer.write("\n");
-            List<Task> history = getHistory();
-            if (!history.isEmpty()) {
-                writer.write(historyToString(history));
+            List<Task> tasksHistory = getHistory();
+            if (!tasksHistory.isEmpty()) {
+                writer.write(historyToString(tasksHistory));
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении в файл", e);
