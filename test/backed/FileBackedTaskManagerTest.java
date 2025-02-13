@@ -142,4 +142,50 @@ class FileBackedTaskManagerTest {
 
         assertEquals(originalId, loadedTask.getId());
     }
+
+    @Test
+    void shouldCorrectlyLoadDataFromFile() {
+        // Создаем задачи разных типов
+        Task task = new Task("Задача", "Описание задачи");
+        Epic epic = new Epic("Эпик", "Описание эпика");
+        manager.createTask(task);
+        manager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача", "Описание подзадачи", epic.getId());
+        manager.createSubtask(subtask);
+
+        // Изменяем статусы
+        task.setStatus(TaskStatus.IN_PROGRESS);
+        manager.updateTask(task);
+        subtask.setStatus(TaskStatus.DONE);
+        manager.updateSubtask(subtask);
+
+        // Создаем историю просмотров
+        manager.getTaskById(task.getId());
+        manager.getEpicById(epic.getId());
+        manager.getSubtaskById(subtask.getId());
+
+        // Загружаем данные в новый менеджер
+        FileBackedTaskManager loadedManager = FileBackedTaskManager.loadFromFile(tempFile);
+
+        // Проверяем корректность загрузки задач
+        assertEquals(task, loadedManager.getTaskById(task.getId()));
+        assertEquals(epic, loadedManager.getEpicById(epic.getId()));
+        assertEquals(subtask, loadedManager.getSubtaskById(subtask.getId()));
+
+        // Проверяем статусы
+        assertEquals(TaskStatus.IN_PROGRESS, loadedManager.getTaskById(task.getId()).getStatus());
+        assertEquals(TaskStatus.DONE, loadedManager.getSubtaskById(subtask.getId()).getStatus());
+
+        // Проверяем историю
+        List<Task> history = loadedManager.getHistory();
+        assertEquals(3, history.size());
+        assertEquals(task.getId(), history.get(0).getId());
+        assertEquals(epic.getId(), history.get(1).getId());
+        assertEquals(subtask.getId(), history.get(2).getId());
+
+        // Проверяем связи между эпиком и подзадачами
+        Epic loadedEpic = loadedManager.getEpicById(epic.getId());
+        assertTrue(loadedEpic.getSubtaskIds().contains(subtask.getId()));
+        assertEquals(epic.getId(), loadedManager.getSubtaskById(subtask.getId()).getEpicId());
+    }
 }
