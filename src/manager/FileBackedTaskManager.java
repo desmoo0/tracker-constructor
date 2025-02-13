@@ -124,8 +124,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = parts[2];
         TaskStatus status = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
-        
         Task task;
+
         TaskType taskType = TaskType.valueOf(type);
         switch (taskType) {
             case TASK:
