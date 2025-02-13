@@ -58,16 +58,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return basicString + ",";
     }
 
-    private String historyToString(List<Task> history) {
-        StringBuilder sb = new StringBuilder();
-        for (Task task : history) {
-            sb.append(task.getId()).append(",");
+    private String historyToString(List<Task> tasksHistory) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Task task : tasksHistory) {
+            stringBuilder.append(task.getId()).append(",");
         }
-        if (!sb.isEmpty()) {
-            sb.setLength(sb.length() - 1); // Удаляем последнюю запятую
+        if (stringBuilder.length() > 0) {
+            stringBuilder.setLength(stringBuilder.length() - 1);
         }
-        return sb.toString();
-    }
+        return stringBuilder.toString();
+}
 
     public static FileBackedTaskManager loadFromFile(File file) {
         if (!file.exists()) {
@@ -125,20 +125,20 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskStatus status = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
 
-        Task task;
-        switch (type) {
-            case "TASK":
+        TaskType taskType = TaskType.valueOf(type);
+        switch (taskType) {
+            case TASK:
                 task = new Task(name, description);
                 break;
-            case "EPIC":
+            case EPIC:
                 task = new Epic(name, description);
                 break;
-            case "SUBTASK":
+            case SUBTASK:
                 int epicId = Integer.parseInt(parts[5]);
                 task = new Subtask(name, description, epicId);
                 break;
             default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
+                throw new IllegalArgumentException("Неизвестный тип задачи: " + taskType);
         }
         task.setId(id);
         task.setStatus(status);
