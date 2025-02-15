@@ -50,5 +50,7 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    Object getTask(Integer integer);
+    Task getTask(int id);
+
+    List<Task> getPrioritizedTasks();
 }
