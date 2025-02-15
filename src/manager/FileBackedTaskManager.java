@@ -3,6 +3,8 @@ package manager;
 import task.*;
 import java.io.*;
 import java.util.List;
+import java.time.LocalDateTime;
+import java.time.Duration;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
@@ -126,8 +128,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = parts[2];
         TaskStatus status = parts[3].equals("null") ? TaskStatus.NEW : TaskStatus.valueOf(parts[3]);
         String description = parts[4];
-        Task task;
 
+        // Парсим время и продолжительность
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
+
+        Task task;
         TaskType taskType = TaskType.valueOf(type);
         switch (taskType) {
             case TASK:
@@ -137,12 +143,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task = new Epic(name, description);
                 break;
             case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]);
+                int epicId = Integer.parseInt(parts[7]);
                 task = new Subtask(name, description, epicId);
                 break;
             default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + taskType);
+                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
         }
+
         task.setId(id);
         task.setStatus(status);
         task.setStartTime(startTime);
