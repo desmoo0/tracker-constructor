@@ -360,6 +360,7 @@ public class InMemoryTaskManager implements TaskManager {
 
         return !end1.isBefore(start2) && !end2.isBefore(start1);
     }
+
     @Override
     public Task getTask(Integer id) {
         return getTaskById(id);
