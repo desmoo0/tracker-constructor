@@ -343,8 +343,12 @@ public class InMemoryTaskManager implements TaskManager {
         return t1.getStartTime().compareTo(t2.getStartTime());
     });
 
+    @Override
     public List<Task> getPrioritizedTasks() {
-        return new ArrayList<>(prioritizedTasks);
+        return tasks.values().stream()
+            .filter(task -> task.getStartTime() != null)
+            .sorted(Comparator.comparing(Task::getStartTime))
+            .collect(Collectors.toList());
     }
 
     private boolean checkTasksOverlap(Task task1, Task task2) {
