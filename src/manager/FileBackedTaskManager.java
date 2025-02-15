@@ -2,8 +2,6 @@ package manager;
 
 import task.*;
 import java.io.*;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -48,15 +46,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String startTimeStr = task.getStartTime() != null ? task.getStartTime().toString() : "";
         String durationStr = task.getDuration() != null ? String.valueOf(task.getDuration().toMinutes()) : "0";
 
+        String statusStr = task.getStatus() != null ? task.getStatus().toString() : TaskStatus.NEW.toString();
+
         return String.format("%d,%s,%s,%s,%s,%s,%s,%s",
-                task.getId(),
-                task.getClass().getSimpleName().toUpperCase(),
-                task.getName(),
-                task.getStatus(),
-                task.getDescription(),
-                startTimeStr,
-                durationStr,
-                task instanceof Subtask ? ((Subtask) task).getEpicId() : ""
+            task.getId(),
+            task.getClass().getSimpleName().toUpperCase(),
+            task.getName(),
+            statusStr,
+            task.getDescription(),
+            startTimeStr,
+            durationStr,
+            task instanceof Subtask ? ((Subtask) task).getEpicId() : ""
         );
     }
 
@@ -124,14 +124,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         int id = Integer.parseInt(parts[0]);
         String type = parts[1];
         String name = parts[2];
-        TaskStatus status = TaskStatus.valueOf(parts[3]);
+        TaskStatus status = parts[3].equals("null") ? TaskStatus.NEW : TaskStatus.valueOf(parts[3]);
         String description = parts[4];
-
-        // Парсим время и продолжительность
-        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
-        Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
-
         Task task;
+
         TaskType taskType = TaskType.valueOf(type);
         switch (taskType) {
             case TASK:
@@ -141,13 +137,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task = new Epic(name, description);
                 break;
             case SUBTASK:
-                int epicId = Integer.parseInt(parts[7]);
+                int epicId = Integer.parseInt(parts[5]);
                 task = new Subtask(name, description, epicId);
                 break;
             default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
+                throw new IllegalArgumentException("Неизвестный тип задачи: " + taskType);
         }
-
         task.setId(id);
         task.setStatus(status);
         task.setStartTime(startTime);
