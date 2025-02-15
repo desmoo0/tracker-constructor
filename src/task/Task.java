@@ -86,9 +86,12 @@ public class Task {
     public Task copy() {
         Task copy = new Task(this.name, this.description);
         copy.setId(this.id);
-        copy.setStatus(this.status);
+        copy.setStatus(this.status != null ? this.status : TaskStatus.NEW);
+        copy.setStartTime(this.startTime);
+        copy.setDuration(this.duration);
+
         return copy;
-    }
+}
 
     public LocalDateTime getEndTime() {
         if (startTime == null || duration == null) {
