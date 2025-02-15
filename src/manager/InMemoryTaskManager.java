@@ -9,6 +9,12 @@ import task.Epic;
 import task.Subtask;
 import task.Task;
 import task.TaskStatus;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     private int nextId = 1;
@@ -343,14 +349,6 @@ public class InMemoryTaskManager implements TaskManager {
         return t1.getStartTime().compareTo(t2.getStartTime());
     });
 
-    @Override
-    public List<Task> getPrioritizedTasks() {
-        return tasks.values().stream()
-            .filter(task -> task.getStartTime() != null)
-            .sorted(Comparator.comparing(Task::getStartTime))
-            .collect(Collectors.toList());
-    }
-
     private boolean checkTasksOverlap(Task task1, Task task2) {
         if (task1.getStartTime() == null || task2.getStartTime() == null
                 || task1.getEndTime() == null || task2.getEndTime() == null) {
@@ -366,7 +364,15 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task getTask(Integer id) {
-        return getTaskById(id);
+    public Task getTask(int id) {
+        return tasks.get(id);
+    }
+
+    @Override
+    public List<Task> getPrioritizedTasks() {
+        return tasks.values().stream()
+                .filter(task -> task.getStartTime() != null)
+                .sorted(Comparator.comparing(Task::getStartTime))
+                .collect(Collectors.toList());
     }
 }
