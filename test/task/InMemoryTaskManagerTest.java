@@ -210,4 +210,35 @@ class InMemoryTaskManagerTest {
         taskManager.deleteTaskById(999); // Нет такой задачи
         // Ожидается, что исключений не будет
     }
+
+    @Test
+    void shouldNotAllowOverlappingTasks() {
+        Task task1 = new Task("Задача 1", "Описание 1");
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+        task1.setDuration(Duration.ofHours(2));
+
+        Task task2 = new Task("Задача 2", "Описание 2");
+        task2.setStartTime(LocalDateTime.of(2024, 1, 1, 11, 0));
+        task2.setDuration(Duration.ofHours(2));
+
+        taskManager.createTask(task1);
+
+        assertThrows(IllegalStateException.class, () -> taskManager.createTask(task2));
+    }
+
+    @Test
+    void shouldReturnSortedTasks() {
+        Task task1 = new Task("Задача 1", "Описание 1");
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 12, 0));
+
+        Task task2 = new Task("Задача 2", "Описание 2");
+        task2.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+
+        taskManager.createTask(task1);
+        taskManager.createTask(task2);
+
+        List<Task> prioritized = taskManager.getPrioritizedTasks();
+        assertEquals(task2, prioritized.get(0));
+        assertEquals(task1, prioritized.get(1));
+    }
 }

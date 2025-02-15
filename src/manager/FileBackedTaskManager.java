@@ -2,6 +2,8 @@ package manager;
 
 import task.*;
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -43,19 +45,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) {
-        String type = task.getClass().getSimpleName().toUpperCase();
-        String basicString = String.format("%d,%s,%s,%s,%s",
+        String startTimeStr = task.getStartTime() != null ? task.getStartTime().toString() : "";
+        String durationStr = task.getDuration() != null ? String.valueOf(task.getDuration().toMinutes()) : "0";
+
+        return String.format("%d,%s,%s,%s,%s,%s,%s,%s",
                 task.getId(),
-                type,
+                task.getClass().getSimpleName().toUpperCase(),
                 task.getName(),
                 task.getStatus(),
-                task.getDescription()
+                task.getDescription(),
+                startTimeStr,
+                durationStr,
+                task instanceof Subtask ? ((Subtask) task).getEpicId() : ""
         );
-
-        if (task instanceof Subtask) {
-            return basicString + "," + ((Subtask) task).getEpicId();
-        }
-        return basicString + ",";
     }
 
     private String historyToString(List<Task> tasksHistory) {
@@ -124,8 +126,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = parts[2];
         TaskStatus status = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
-        Task task;
 
+        // Парсим время и продолжительность
+        LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
+        Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
+
+        Task task;
         TaskType taskType = TaskType.valueOf(type);
         switch (taskType) {
             case TASK:
@@ -135,14 +141,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 task = new Epic(name, description);
                 break;
             case SUBTASK:
-                int epicId = Integer.parseInt(parts[5]);
+                int epicId = Integer.parseInt(parts[7]);
                 task = new Subtask(name, description, epicId);
                 break;
             default:
-                throw new IllegalArgumentException("Неизвестный тип задачи: " + taskType);
+                throw new IllegalArgumentException("Неизвестный тип задачи: " + type);
         }
+
         task.setId(id);
         task.setStatus(status);
+        task.setStartTime(startTime);
+        task.setDuration(duration);
+
         return task;
     }
 
