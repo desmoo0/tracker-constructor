@@ -30,6 +30,13 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager = Managers.getDefaultHistory();
     }
 
+    private final Set<Task> prioritizedTasks = new TreeSet<>((task, taskToCompare) -> {
+        if (task.getStartTime() == null && taskToCompare.getStartTime() == null) return 0;
+        if (task.getStartTime() == null) return 1;
+        if (taskToCompare.getStartTime() == null) return -1;
+        return task.getStartTime().compareTo(taskToCompare.getStartTime());
+    });
+
     // Присвоим айди следующей задаче, увеличенной на +1
     public int generateId() {
         return nextId++;
@@ -341,13 +348,6 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
-
-    private Set<Task> prioritizedTasks = new TreeSet<>((t1, t2) -> {
-        if (t1.getStartTime() == null && t2.getStartTime() == null) return 0;
-        if (t1.getStartTime() == null) return 1;
-        if (t2.getStartTime() == null) return -1;
-        return t1.getStartTime().compareTo(t2.getStartTime());
-    });
 
     private boolean checkTasksOverlap(Task task1, Task task2) {
         if (task1.getStartTime() == null || task2.getStartTime() == null

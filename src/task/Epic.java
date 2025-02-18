@@ -1,7 +1,5 @@
 package task;
 
-import manager.TaskManager;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -12,17 +10,10 @@ import java.util.stream.Collectors;
 public class Epic extends Task {
     protected List<Integer> subtaskIds;
     private LocalDateTime endTime;
-    private TaskManager taskManager;
 
     public Epic(String name, String description) {
         super(name, description);
         this.subtaskIds = new ArrayList<>();
-    }
-
-    public Epic(String name, String description, Duration duration, LocalDateTime startTime, TaskManager taskManager) {
-        super(name, description, duration, startTime);
-        this.subtaskIds = new ArrayList<>();
-        this.taskManager = taskManager;
     }
 
     public List<Integer> getSubtaskIds() {

@@ -58,7 +58,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             task.getDescription(),
             startTimeStr,
             durationStr,
-            task instanceof Subtask ? ((Subtask) task).getEpicId() : ""
+            task.getEpicId()
         );
     }
 
@@ -67,7 +67,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         for (Task task : tasksHistory) {
             stringBuilder.append(task.getId()).append(",");
         }
-        if (stringBuilder.length() > 0) {
+        if (!stringBuilder.isEmpty()) {
             stringBuilder.setLength(stringBuilder.length() - 1);
         }
         return stringBuilder.toString();

@@ -115,4 +115,8 @@ public class Task {
     public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
+
+    public String getEpicId() {
+        return "";
+    }
 }
