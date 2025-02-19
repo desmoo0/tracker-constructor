@@ -55,7 +55,7 @@ public class Epic extends Task {
     @Override
     public Duration getDuration() {
         return subtaskIds.stream()
-                .map(subtaskId -> Duration.ZERO) // здесь должна быть логика получения Duration для каждой подзадачи
+                .map(subtaskId -> Duration.ZERO)
                 .filter(Objects::nonNull)
                 .collect(Collectors.reducing(Duration.ZERO, (d1, d2) -> d1.plus(d2)));
     }
@@ -63,7 +63,7 @@ public class Epic extends Task {
     @Override
     public LocalDateTime getStartTime() {
         return subtaskIds.stream()
-                .map(subtaskId -> LocalDateTime.now()) // здесь должна быть логика получения StartTime для каждой подзадачи
+                .map(subtaskId -> LocalDateTime.now())
                 .filter(Objects::nonNull)
                 .collect(Collectors.minBy(LocalDateTime::compareTo))
                 .orElse(null);

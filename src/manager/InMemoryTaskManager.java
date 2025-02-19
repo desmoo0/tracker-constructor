@@ -1,6 +1,5 @@
 package manager;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -202,33 +201,15 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpicStatus(Epic epic) {
         if (epic.getSubtaskIds().isEmpty()) {
             epic.setStatus(TaskStatus.NEW);
-            epic.setStartTime(null);
-            epic.setDuration(Duration.ZERO);
-            epic.setEndTime(null);
             return;
         }
 
-        List<Subtask> epicSubtasks = getEpicSubtasks(epic.getId());
         boolean allNew = true;
         boolean allDone = true;
 
-        LocalDateTime earliestStart = null;
-        LocalDateTime latestEnd = null;
-        Duration totalDuration = Duration.ZERO;
-
-        for (Subtask subtask : epicSubtasks) {
-            if (subtask.getStartTime() != null) {
-                if (earliestStart == null || subtask.getStartTime().isBefore(earliestStart)) {
-                    earliestStart = subtask.getStartTime();
-                }
-                LocalDateTime subtaskEnd = subtask.getEndTime();
-                if (latestEnd == null || subtaskEnd.isAfter(latestEnd)) {
-                    latestEnd = subtaskEnd;
-                }
-            }
-            if (subtask.getDuration() != null) {
-                totalDuration = totalDuration.plus(subtask.getDuration());
-            }
+        for (Integer subtaskId : epic.getSubtaskIds()) {
+            Subtask subtask = subtasks.get(subtaskId);
+            if (subtask == null) continue;
 
             if (subtask.getStatus() != TaskStatus.NEW) {
                 allNew = false;
@@ -237,10 +218,6 @@ public class InMemoryTaskManager implements TaskManager {
                 allDone = false;
             }
         }
-
-        epic.setStartTime(earliestStart);
-        epic.setDuration(totalDuration);
-        epic.setEndTime(latestEnd);
 
         if (allNew) {
             epic.setStatus(TaskStatus.NEW);
@@ -374,5 +351,9 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter(task -> task.getStartTime() != null)
                 .sorted(Comparator.comparing(Task::getStartTime))
                 .collect(Collectors.toList());
+    }
+
+    public List<Subtask> getSubtasks() {
+        return new ArrayList<>(subtasks.values());
     }
 }

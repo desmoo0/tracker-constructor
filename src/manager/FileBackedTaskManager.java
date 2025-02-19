@@ -10,34 +10,54 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private final File file;
 
     public FileBackedTaskManager(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("Файл не может быть пустой.");
+        }
         this.file = file;
+
+        // Создаем файл и записываем заголовок, если файл не существует
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+                // Записываем заголовок в новый файл
+                try (Writer writer = new FileWriter(file)) {
+                    writer.write("id,type,name,status,description,epic\n");
+                }
+            } catch (IOException e) {
+                throw new ManagerSaveException("Ошибка при создании файла", e);
+            }
+        }
     }
 
     public void save() {
-        try (Writer writer = new FileWriter(file)) {
-            // Записываем заголовок
-            writer.write("id,type,name,status,description,epic\n");
-
-            // Сохраняем задачи
-            for (Task task : getAllTasks()) {
-                writer.write(toString(task) + "\n");
+        try {
+            File parent = file.getParentFile();
+            if (parent != null && !parent.exists()) {
+                parent.mkdirs();
             }
 
-            // Сохраняем эпики
-            for (Epic epic : getAllEpics()) {
-                writer.write(toString(epic) + "\n");
-            }
+            try (Writer writer = new FileWriter(file)) {
+                // Записываем заголовок
+                writer.write("id,type,name,status,description,epic\n");
 
-            // Сохраняем подзадачи
-            for (Subtask subtask : getAllSubtasks()) {
-                writer.write(toString(subtask) + "\n");
-            }
+                // Сохраняем задачи
+                for (Task task : getAllTasks()) {
+                    writer.write(toString(task) + "\n");
+                }
 
-            // Сохраняем историю
-            writer.write("\n");
-            List<Task> tasksHistory = getHistory();
-            if (!tasksHistory.isEmpty()) {
-                writer.write(historyToString(tasksHistory));
+                // Сохраняем эпики
+                for (Epic epic : getAllEpics()) {
+                    writer.write(toString(epic) + "\n");
+                }
+
+                // Сохраняем подзадачи
+                for (Subtask subtask : getAllSubtasks()) {
+                    writer.write(toString(subtask) + "\n");
+                }
+
+                // Сохраняем историю
+                writer.write("\n");
+                writer.write(historyToString()); // Убрали передачу аргумента
             }
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при сохранении в файл", e);
@@ -62,18 +82,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         );
     }
 
-    private String historyToString(List<Task> tasksHistory) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (Task task : tasksHistory) {
-            stringBuilder.append(task.getId()).append(",");
+    private String historyToString() {
+        List<Task> history = getHistory();
+        if (history.isEmpty()) {
+            return "";
         }
-        if (!stringBuilder.isEmpty()) {
-            stringBuilder.setLength(stringBuilder.length() - 1);
+        StringBuilder sb = new StringBuilder();
+        for (Task task : history) {
+            sb.append(task.getId()).append(",");
         }
-        return stringBuilder.toString();
-}
+        return sb.substring(0, sb.length() - 1);
+    }
 
     public static FileBackedTaskManager loadFromFile(File file) {
+        if (file == null) {
+            throw new IllegalArgumentException("Файл не может быть null");
+        }
+
         if (!file.exists()) {
             throw new ManagerSaveException("Файл не найден: " + file.getPath(), null);
         }
@@ -82,8 +107,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line = reader.readLine(); // Пропускаем заголовок
-            if (line == null) {
-                return manager; // Возвращаем пустой менеджер, если файл пустой
+            if (line == null || !line.equals("id,type,name,status,description,epic")) {
+                throw new ManagerSaveException("Некорректный формат файла", null);
             }
 
             while ((line = reader.readLine()) != null && !line.isBlank()) {
@@ -116,8 +141,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при чтении из файла", e);
+            throw new ManagerSaveException("Ошибка при чтении файла", e);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            throw new ManagerSaveException("Некорректные данные в файле", e);
         }
+
         return manager;
     }
 
@@ -158,7 +186,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return task;
     }
 
-    // Переопределение всех модифицирующих методов
     @Override
     public void createTask(Task task) {
         super.createTask(task);
@@ -173,8 +200,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void createSubtask(Subtask subtask) {
-        super.createSubtask(subtask);
-        save();
+        if (epics.containsKey(subtask.getEpicId())) {
+            super.createSubtask(subtask);
+            save();
+        }
     }
 
     @Override
@@ -250,6 +279,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Subtask subtask = super.getSubtaskById(id);
         save();
         return subtask;
+    }
+
+    @Override
+    public List<Subtask> getSubtasks() {
+        List<Subtask> result = super.getSubtasks();
+        save();
+        return result;
     }
 }
 
