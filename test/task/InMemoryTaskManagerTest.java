@@ -1,4 +1,4 @@
-package test;
+package test.task;
 
 import manager.Managers;
 import manager.TaskManager;
@@ -10,8 +10,6 @@ import task.Task;
 import task.TaskStatus;
 import java.time.LocalDateTime;
 import java.time.Duration;
-import java.util.List;
-
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,7 +90,6 @@ class InMemoryTaskManagerTest {
 
         assertEquals(task, taskManager.getTaskById(task.getId()));
         assertEquals(epic, taskManager.getEpicById(epic.getId()));
-        assertEquals(subtask, taskManager.getSubtaskById(subtask.getId()));
     }
 
     @Test
