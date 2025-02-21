@@ -112,7 +112,4 @@ public class Task {
         this.startTime = startTime;
     }
 
-    public String getEpicId() {
-        return "";
-    }
 }

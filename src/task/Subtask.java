@@ -16,9 +16,8 @@ public class Subtask extends Task {
         this.epicId = epicId;
     }
 
-    @Override
-    public String getEpicId() {
-        return String.valueOf(epicId);
+    public int getEpicId() { // Возвращаем int
+        return epicId;
     }
 
     // Переопределим метод, и для удобства - названия переменных будем писать на английском

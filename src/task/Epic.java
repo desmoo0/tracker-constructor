@@ -57,7 +57,7 @@ public class Epic extends Task {
         return subtaskIds.stream()
                 .map(subtaskId -> Duration.ZERO)
                 .filter(Objects::nonNull)
-                .collect(Collectors.reducing(Duration.ZERO, (d1, d2) -> d1.plus(d2)));
+                .collect(Collectors.reducing(Duration.ZERO, (firstTime, secondTime) -> firstTime.plus(secondTime)));
     }
 
     @Override
