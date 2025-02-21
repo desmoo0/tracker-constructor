@@ -135,10 +135,10 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         manager.createSubtask(subtask);
 
         // Проверяем, что подзадача создалась
-        assertEquals(0, manager.getSubtasks().size(), "Подзадача не была создана");
+        assertEquals(1, manager.getSubtasks().size(), "Подзадача не была создана");
 
         // Проверяем связь с эпиком
-        assertEquals(epic.getId(), Integer.parseInt(subtask.getEpicId()), "Неверная связь подзадачи с эпиком");
+        assertEquals(epic.getId(), subtask.getEpicId(), "Неверная связь подзадачи с эпиком");
     }
 
     @Test
