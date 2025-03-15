@@ -1,12 +1,16 @@
 package task;
 
 import java.util.Objects;
+import java.time.LocalDateTime;
+import java.time.Duration;
 
 public class Task {
     protected String name;
     protected String description;
     protected int id;
     protected TaskStatus status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
     public Task(String name, String description) {
         this.name = name;
@@ -14,12 +18,16 @@ public class Task {
         this.status = TaskStatus.NEW;
     }
 
-    public String getName() {
-        return name;
+    public Task(String name, String description, Duration duration, LocalDateTime startTime) {
+        this.name = name;
+        this.description = description;
+        this.status = TaskStatus.NEW;
+        this.duration = duration;
+        this.startTime = startTime;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {
@@ -74,7 +82,34 @@ public class Task {
     public Task copy() {
         Task copy = new Task(this.name, this.description);
         copy.setId(this.id);
-        copy.setStatus(this.status);
+        copy.setStatus(this.status != null ? this.status : TaskStatus.NEW);
+        copy.setStartTime(this.startTime);
+        copy.setDuration(this.duration);
+
         return copy;
+}
+
+    public LocalDateTime getEndTime() {
+        if (startTime == null || duration == null) {
+            return null;
+        }
+        return startTime.plus(duration);
     }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
 }
