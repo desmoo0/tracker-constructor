@@ -23,8 +23,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 try (Writer writer = new FileWriter(file)) {
                     writer.write("id,type,name,status,description,epic\n");
                 }
-            } catch (IOException e) {
-                throw new ManagerSaveException("Ошибка при создании файла", e);
+            } catch (IOException exception) {
+                throw new ManagerSaveException("Ошибка при создании файла", exception);
             }
         }
     }
@@ -59,8 +59,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 writer.write("\n");
                 writer.write(historyToString()); // Убрали передачу аргумента
             }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при сохранении в файл", e);
+        } catch (IOException exception) {
+            throw new ManagerSaveException("Ошибка при сохранении в файл", exception);
         }
     }
 
@@ -139,10 +139,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 }
             }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при чтении файла", e);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            throw new ManagerSaveException("Некорректные данные в файле", e);
+        } catch (IOException exception) {
+            throw new ManagerSaveException("Ошибка при чтении файла", exception);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException exception) {
+            throw new ManagerSaveException("Некорректные данные в файле", exception);
         }
 
         return manager;

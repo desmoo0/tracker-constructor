@@ -30,8 +30,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
             tempDir = Files.createTempDirectory("test");
             tempFile = tempDir.resolve("tasks.csv").toFile();
             super.setUp();
-        } catch (IOException e) {
-            throw new RuntimeException("Ошибка при создании временного файла", e);
+        } catch (IOException exception) {
+            throw new RuntimeException("Ошибка при создании временного файла", exception);
         }
     }
 
@@ -187,8 +187,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
                     .sorted(Comparator.reverseOrder())
                     .map(Path::toFile)
                     .forEach(File::delete);
-        } catch (IOException e) {
-            System.err.println("Ошибка при удалении временных файлов: " + e.getMessage());
+        } catch (IOException exception) {
+            System.err.println("Ошибка при удалении временных файлов: " + exception.getMessage());
         }
     }
 }

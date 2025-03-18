@@ -3,6 +3,7 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import http.HttpStatus;
 import http.HttpTaskServer;
 import manager.TaskManager;
 import task.Epic;
@@ -14,6 +15,9 @@ import java.util.List;
 public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson;
+
+    int OK = Integer.parseInt(HttpStatus.OK.getCode()); //200
+    int METHOD_NOT_ALLOWED = Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()); //405
 
     public EpicsHandler(TaskManager manager) {
         this.manager = manager;
@@ -38,7 +42,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                         sendNotFound(exchange);
                     }
                 } else {
-                    exchange.sendResponseHeaders(405, 0);
+                    exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
                     exchange.close();
                 }
                 return;
@@ -81,22 +85,20 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                     if (id != null) {
                         // Удаление эпика по ID
                         manager.deleteEpicById(id);
-                        exchange.sendResponseHeaders(200, 0);
-                        exchange.close();
                     } else {
                         // Удаление всех эпиков
                         manager.deleteAllEpics();
-                        exchange.sendResponseHeaders(200, 0);
-                        exchange.close();
                     }
+                    exchange.sendResponseHeaders(OK, 0);
+                    exchange.close();
                     break;
                 }
                 default: {
-                    exchange.sendResponseHeaders(405, 0);
+                    exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
                     exchange.close();
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             sendServerError(exchange);
         }
     }

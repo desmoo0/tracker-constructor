@@ -9,7 +9,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class SerializationTest {
-    Gson gson = HttpTaskServer.getGson();
+    private final Gson gson = HttpTaskServer.getGson();
 
     @Test
     public void serializationTest() {

@@ -18,16 +18,16 @@ public class HttpTaskServer {
     public static final int PORT = 8080;
 
     private final HttpServer server;
-    private final TaskManager manager;
 
     public static void main(String[] args) throws IOException {
         TaskManager manager = Managers.getDefault();
         HttpTaskServer taskServer = new HttpTaskServer(manager);
         taskServer.start();
+
+        Runtime.getRuntime().addShutdownHook(new Thread(taskServer::stop));
     }
 
     public HttpTaskServer(TaskManager manager) throws IOException {
-        this.manager = manager;
         server = HttpServer.create(new InetSocketAddress(PORT), 0);
 
         server.createContext("/tasks", new TasksHandler(manager));
@@ -43,7 +43,7 @@ public class HttpTaskServer {
     }
 
     public void stop() {
-        System.out.println("Останавливаем сервер на порту " + PORT);
+        //System.out.println("Останавливаем сервер на порту " + PORT);
         server.stop(0);
     }
 

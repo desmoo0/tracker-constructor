@@ -3,6 +3,7 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import http.HttpStatus;
 import http.HttpTaskServer;
 import manager.TaskManager;
 import task.Task;
@@ -13,6 +14,9 @@ import java.util.List;
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson;
+
+    int OK = Integer.parseInt(HttpStatus.OK.getCode()); //200
+    int METHOD_NOT_ALLOWED = Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()); //405
 
     public TasksHandler(TaskManager manager) {
         this.manager = manager;
@@ -56,7 +60,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                             manager.createTask(task);
                         }
                         sendCreated(exchange);
-                    } catch (IllegalStateException e) {
+                    } catch (IllegalStateException illegalException) {
                         sendHasInteractions(exchange);
                     }
                     break;
@@ -65,22 +69,20 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     if (id != null) {
                         // Удаление задачи по ID
                         manager.deleteTaskById(id);
-                        exchange.sendResponseHeaders(200, 0);
-                        exchange.close();
                     } else {
                         // Удаление всех задач
                         manager.deleteAllTasks();
-                        exchange.sendResponseHeaders(200, 0);
-                        exchange.close();
                     }
+                    exchange.sendResponseHeaders(OK, 0);
+                    exchange.close();
                     break;
                 }
                 default: {
-                    exchange.sendResponseHeaders(405, 0);
+                    exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
                     exchange.close();
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception exception) {
             sendServerError(exchange);
         }
     }
