@@ -15,16 +15,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         this.file = file;
 
-        // Создаем файл и записываем заголовок, если файл не существует
         if (!file.exists()) {
             try {
                 file.createNewFile();
-                // Записываем заголовок в новый файл
                 try (Writer writer = new FileWriter(file)) {
                     writer.write("id,type,name,status,description,epic\n");
                 }
-            } catch (IOException e) {
-                throw new ManagerSaveException("Ошибка при создании файла", e);
+            } catch (IOException exception) {
+                throw new ManagerSaveException("Ошибка при создании файла", exception);
             }
         }
     }
@@ -59,8 +57,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 writer.write("\n");
                 writer.write(historyToString()); // Убрали передачу аргумента
             }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при сохранении в файл", e);
+        } catch (IOException exception) {
+            throw new ManagerSaveException("Ошибка при сохранении в файл", exception);
         }
     }
 
@@ -139,10 +137,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     }
                 }
             }
-        } catch (IOException e) {
-            throw new ManagerSaveException("Ошибка при чтении файла", e);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            throw new ManagerSaveException("Некорректные данные в файле", e);
+        } catch (IOException exception) {
+            throw new ManagerSaveException("Ошибка при чтении файла", exception);
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException exception) {
+            throw new ManagerSaveException("Некорректные данные в файле", exception);
         }
 
         return manager;
@@ -156,7 +154,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskStatus status = parts[3].equals("null") ? TaskStatus.NEW : TaskStatus.valueOf(parts[3]);
         String description = parts[4];
 
-        // Парсим время и продолжительность
         LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
         Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
 

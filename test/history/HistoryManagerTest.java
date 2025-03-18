@@ -1,11 +1,13 @@
-package test.history;
+package history;
 
 import history.HistoryManager;
 import manager.Managers;
-import task.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
+import task.Task;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HistoryManagerTest {
     private HistoryManager historyManager;
