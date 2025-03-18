@@ -26,8 +26,6 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         try {
             String path = exchange.getRequestURI().getPath();
             final Integer id = getIdFromPath(path);
-
-            // Проверяем специальный случай для получения подзадач эпика
             if (path.contains("/subtasks") && id != null) {
                 if (exchange.getRequestMethod().equals("GET")) {
                     Epic epic = manager.getEpicById(id);
@@ -44,16 +42,13 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                 }
                 return;
             }
-
             switch (exchange.getRequestMethod()) {
                 case "GET": {
                     if (id == null) {
-                        // Получение всех эпиков
                         final List<Epic> epics = manager.getAllEpics();
                         final String response = gson.toJson(epics);
                         sendText(exchange, response);
                     } else {
-                        // Получение эпика по ID
                         final Epic epic = manager.getEpicById(id);
                         if (epic != null) {
                             final String response = gson.toJson(epic);
@@ -69,10 +64,8 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                     final Epic epic = gson.fromJson(json, Epic.class);
 
                     if (epic.getId() != 0) {
-                        // Обновление существующего эпика
                         manager.updateEpic(epic);
                     } else {
-                        // Создание нового эпика
                         manager.createEpic(epic);
                     }
                     sendCreated(exchange);
@@ -80,10 +73,8 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                 }
                 case "DELETE": {
                     if (id != null) {
-                        // Удаление эпика по ID
                         manager.deleteEpicById(id);
                     } else {
-                        // Удаление всех эпиков
                         manager.deleteAllEpics();
                     }
                     exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), 0);

@@ -20,8 +20,8 @@ public class HttpTaskServer {
     private final HttpServer server;
 
     public static void main(String[] args) throws IOException {
-        TaskManager manager = Managers.getDefault();
-        HttpTaskServer taskServer = new HttpTaskServer(manager);
+        var manager = Managers.getDefault();
+        var taskServer = new HttpTaskServer(manager);
         taskServer.start();
 
         Runtime.getRuntime().addShutdownHook(new Thread(taskServer::stop));
@@ -48,7 +48,7 @@ public class HttpTaskServer {
     }
 
     public static Gson getGson() {
-        GsonBuilder gsonBuilder = new GsonBuilder();
+        var gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter());
         gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
         return gsonBuilder.create();

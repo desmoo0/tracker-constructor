@@ -9,6 +9,7 @@ import manager.TaskManager;
 import task.Task;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public abstract class UserHandler extends BaseHttpHandler implements HttpHandler {
@@ -26,13 +27,17 @@ public abstract class UserHandler extends BaseHttpHandler implements HttpHandler
             if ("GET".equals(exchange.getRequestMethod())) {
                 final List<Task> tasks = getTasks();
                 final String response = gson.toJson(tasks);
-                sendText(exchange, response);
+                try (var outputStream = exchange.getResponseBody()) {
+                    byte[] responseBytes = response.getBytes(StandardCharsets.UTF_8);
+                    exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+                    exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), responseBytes.length);
+                    outputStream.write(responseBytes);
+                }
             } else {
                 exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
-                exchange.close();
             }
         } catch (Exception exception) {
-            sendServerError(exchange);
+            exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.INTERNAL_SERVER_ERROR.getCode()), 0);
         }
     }
 

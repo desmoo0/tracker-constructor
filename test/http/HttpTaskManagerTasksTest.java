@@ -2,12 +2,12 @@ package http;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import manager.InMemoryTaskManager;
+import manager.TaskManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import manager.TaskManager;
-import manager.InMemoryTaskManager;
 import task.Task;
 
 import java.io.IOException;
@@ -141,7 +141,8 @@ public class HttpTaskManagerTasksTest {
 
             assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
-            Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Task>>() {
+            }.getType();
             List<Task> tasksFromResponse = gson.fromJson(response.body(), listType);
 
             assertEquals(2, tasksFromResponse.size());
@@ -306,7 +307,8 @@ public class HttpTaskManagerTasksTest {
 
             assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
-            Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Task>>() {
+            }.getType();
             List<Task> history = gson.fromJson(response.body(), listType);
 
             assertEquals(1, history.size());
@@ -332,7 +334,8 @@ public class HttpTaskManagerTasksTest {
 
             assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
-            Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Task>>() {
+            }.getType();
             List<Task> prioritizedTasks = gson.fromJson(response.body(), listType);
 
             assertEquals(2, prioritizedTasks.size());
@@ -360,7 +363,8 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
+            Type listType = new TypeToken<ArrayList<Task>>() {
+            }.getType();
             List<Task> prioritizedTasks = gson.fromJson(response.body(), listType);
 
             assertEquals(3, prioritizedTasks.size());

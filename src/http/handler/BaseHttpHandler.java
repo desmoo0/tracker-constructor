@@ -10,15 +10,18 @@ public class BaseHttpHandler {
     private static final int NUM_PARTS_IN_PATH_WITH_ID = 3;
 
     protected String readText(HttpExchange exchange) throws IOException {
-        return new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        try (var inputStream = exchange.getRequestBody()) {
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 
     protected void sendText(HttpExchange exchange, String text) throws IOException {
         byte[] response = text.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
         exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), response.length);
-        exchange.getResponseBody().write(response);
-        exchange.close();
+        try (var outputStream = exchange.getResponseBody()) {
+            outputStream.write(response);
+        }
     }
 
     protected void sendNotFound(HttpExchange exchange) throws IOException {
