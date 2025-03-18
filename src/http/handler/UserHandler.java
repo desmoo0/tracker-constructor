@@ -15,8 +15,6 @@ public abstract class UserHandler extends BaseHttpHandler implements HttpHandler
     protected final TaskManager manager;
     protected final Gson gson;
 
-    int METHOD_NOT_ALLOWED = Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()); //405
-
     public UserHandler(TaskManager manager) {
         this.manager = manager;
         this.gson = HttpTaskServer.getGson();
@@ -30,7 +28,7 @@ public abstract class UserHandler extends BaseHttpHandler implements HttpHandler
                 final String response = gson.toJson(tasks);
                 sendText(exchange, response);
             } else {
-                exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
+                exchange.sendResponseHeaders(405, 0);
                 exchange.close();
             }
         } catch (Exception exception) {
