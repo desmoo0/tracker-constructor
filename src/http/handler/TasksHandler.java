@@ -24,11 +24,10 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         final Integer id = getIdFromPath(exchange.getRequestURI().getPath());
-        try {
+        try (exchange) {
             switch (exchange.getRequestMethod()) {
                 case "GET": {
                     if (id == null) {
-                        // Получение всех задач
                         final List<Task> tasks = manager.getAllTasks();
                         final String response = gson.toJson(tasks);
                         try (var outputStream = exchange.getResponseBody()) {
@@ -38,7 +37,6 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                             outputStream.write(responseBytes);
                         }
                     } else {
-                        // Получение задачи по ID
                         final Task task = manager.getTaskById(id);
                         if (task != null) {
                             final String response = gson.toJson(task);
@@ -59,7 +57,14 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     try (var inputStream = exchange.getRequestBody()) {
                         json = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
                     }
-                    final Task task = gson.fromJson(json, Task.class);
+
+                    Task task;
+                    try {
+                        task = gson.fromJson(json, Task.class);
+                    } catch (com.google.gson.JsonSyntaxException e) {
+                        sendServerError(exchange);
+                        return;
+                    }
 
                     try {
                         if (task.getId() != 0) {
@@ -75,10 +80,8 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 }
                 case "DELETE": {
                     if (id != null) {
-                        // Удаление задачи по ID
                         manager.deleteTaskById(id);
                     } else {
-                        // Удаление всех задач
                         manager.deleteAllTasks();
                     }
                     exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), 0);
@@ -88,7 +91,6 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 }
                 default: {
                     exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
-                    exchange.close();
                 }
             }
         } catch (Exception exception) {

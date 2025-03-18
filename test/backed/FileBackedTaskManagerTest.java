@@ -1,4 +1,4 @@
-package test.backed;
+package backed;
 
 import manager.FileBackedTaskManager;
 import manager.ManagerSaveException;
@@ -9,7 +9,7 @@ import task.Epic;
 import task.Subtask;
 import task.Task;
 import task.TaskStatus;
-import test.task.TaskManagerTest;
+import task.TaskManagerTest;
 
 import java.io.File;
 import java.io.IOException;

@@ -15,11 +15,9 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         this.file = file;
 
-        // Создаем файл и записываем заголовок, если файл не существует
         if (!file.exists()) {
             try {
                 file.createNewFile();
-                // Записываем заголовок в новый файл
                 try (Writer writer = new FileWriter(file)) {
                     writer.write("id,type,name,status,description,epic\n");
                 }

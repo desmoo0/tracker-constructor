@@ -26,22 +26,22 @@ public class BaseHttpHandler {
 
     protected void sendNotFound(HttpExchange exchange) throws IOException {
         exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.NOT_FOUND.getCode()), 0);
-        exchange.close();
+        //exchange.close();
     }
 
     protected void sendHasInteractions(HttpExchange exchange) throws IOException {
         exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.NOT_ACCEPTABLE.getCode()), 0);
-        exchange.close();
+        //exchange.close();
     }
 
     protected void sendCreated(HttpExchange exchange) throws IOException {
         exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.CREATED.getCode()), 0);
-        exchange.close();
+        //exchange.close();
     }
 
     protected void sendServerError(HttpExchange exchange) throws IOException {
         exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.INTERNAL_SERVER_ERROR.getCode()), 0);
-        exchange.close();
+        //exchange.close();
     }
 
     protected Integer getIdFromPath(String path) {

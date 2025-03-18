@@ -24,7 +24,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         final Integer id = getIdFromPath(exchange.getRequestURI().getPath());
-        try {
+        try (exchange) {
             switch (exchange.getRequestMethod()) {
                 case "GET": {
                     if (id == null) {

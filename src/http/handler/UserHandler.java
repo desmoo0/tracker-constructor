@@ -23,7 +23,7 @@ public abstract class UserHandler extends BaseHttpHandler implements HttpHandler
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        try {
+        try (exchange) {
             if ("GET".equals(exchange.getRequestMethod())) {
                 final List<Task> tasks = getTasks();
                 final String response = gson.toJson(tasks);

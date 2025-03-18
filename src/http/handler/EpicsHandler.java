@@ -23,7 +23,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        try {
+        try (exchange) {
             String path = exchange.getRequestURI().getPath();
             final Integer id = getIdFromPath(path);
             if (path.contains("/subtasks") && id != null) {
@@ -38,7 +38,6 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                     }
                 } else {
                     exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
-                    exchange.close();
                 }
                 return;
             }
@@ -78,12 +77,10 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                         manager.deleteAllEpics();
                     }
                     exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), 0);
-                    exchange.close();
                     break;
                 }
                 default: {
                     exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
-                    exchange.close();
                 }
             }
         } catch (Exception exception) {
