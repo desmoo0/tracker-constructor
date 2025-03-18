@@ -3,7 +3,6 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import http.HttpStatus;
 import http.HttpTaskServer;
 import manager.TaskManager;
 import task.Subtask;
@@ -14,9 +13,6 @@ import java.util.List;
 public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson;
-
-    int OK = Integer.parseInt(HttpStatus.OK.getCode()); //200
-    int METHOD_NOT_ALLOWED = Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()); //405
 
     public SubtasksHandler(TaskManager manager) {
         this.manager = manager;
@@ -73,12 +69,12 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                         // Удаление всех подзадач
                         manager.deleteAllSubtasks();
                     }
-                    exchange.sendResponseHeaders(OK, 0);
+                    exchange.sendResponseHeaders(200, 0);
                     exchange.close();
                     break;
                 }
                 default: {
-                    exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
+                    exchange.sendResponseHeaders(405, 0);
                     exchange.close();
                 }
             }
