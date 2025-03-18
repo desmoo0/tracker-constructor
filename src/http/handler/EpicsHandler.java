@@ -16,9 +16,6 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private final TaskManager manager;
     private final Gson gson;
 
-    int OK = Integer.parseInt(HttpStatus.OK.getCode()); //200
-    int METHOD_NOT_ALLOWED = Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()); //405
-
     public EpicsHandler(TaskManager manager) {
         this.manager = manager;
         this.gson = HttpTaskServer.getGson();
@@ -42,7 +39,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                         sendNotFound(exchange);
                     }
                 } else {
-                    exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
+                    exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
                     exchange.close();
                 }
                 return;
@@ -89,12 +86,12 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                         // Удаление всех эпиков
                         manager.deleteAllEpics();
                     }
-                    exchange.sendResponseHeaders(OK, 0);
+                    exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), 0);
                     exchange.close();
                     break;
                 }
                 default: {
-                    exchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
+                    exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
                     exchange.close();
                 }
             }

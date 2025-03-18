@@ -17,4 +17,13 @@ public enum HttpStatus {
     public String getCode() {
         return status;
     }
+
+    public static HttpStatus fromCode(String code) {
+        for (HttpStatus status : HttpStatus.values()) {
+            if (status.getCode().equals(code)) {
+                return status;
+            }
+        }
+        throw new IllegalArgumentException("Неожиданный статус ответа: " + code);
+    }
 }

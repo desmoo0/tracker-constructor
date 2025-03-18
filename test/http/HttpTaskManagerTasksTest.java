@@ -29,13 +29,6 @@ public class HttpTaskManagerTasksTest {
     private final HttpClient client;
     private HttpTaskServer taskServer;
 
-    int OK = Integer.parseInt(HttpStatus.OK.getCode()); //200
-    int CREATED = Integer.parseInt(HttpStatus.CREATED.getCode()); //201
-    int NOT_FOUND = Integer.parseInt(HttpStatus.NOT_FOUND.getCode()); //404
-    int METHOD_NOT_ALLOWED = Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()); //405
-    int NOT_ACCEPTABLE = Integer.parseInt(HttpStatus.NOT_ACCEPTABLE.getCode()); //406
-    int INTERNAL_SERVER_ERROR = Integer.parseInt(HttpStatus.INTERNAL_SERVER_ERROR.getCode()); //500
-
     public HttpTaskManagerTasksTest() throws IOException {
         manager = new InMemoryTaskManager();
         gson = HttpTaskServer.getGson();
@@ -72,7 +65,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(CREATED, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.CREATED.getCode()), response.statusCode());
 
             List<Task> tasks = manager.getAllTasks();
             assertNotNull(tasks);
@@ -96,7 +89,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(CREATED, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.CREATED.getCode()), response.statusCode());
 
             List<Task> tasks = manager.getAllTasks();
             assertNotNull(tasks);
@@ -123,7 +116,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(NOT_ACCEPTABLE, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.NOT_ACCEPTABLE.getCode()), response.statusCode());
             System.out.println("Задача не создана из-за конфликта времени.");
             System.out.println("Тест пройден ✔");
         }
@@ -146,7 +139,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(OK, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
             Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
             List<Task> tasksFromResponse = gson.fromJson(response.body(), listType);
@@ -168,7 +161,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(OK, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
             Task taskFromResponse = gson.fromJson(response.body(), Task.class);
             assertEquals(task.getId(), taskFromResponse.getId());
@@ -186,7 +179,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(NOT_FOUND, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.NOT_FOUND.getCode()), response.statusCode());
             System.out.println("Задача не найдена.");
             System.out.println("Тест пройден ✔");
         }
@@ -211,7 +204,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(CREATED, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.CREATED.getCode()), response.statusCode());
 
             Task retrievedTask = manager.getTaskById(task.getId());
             assertEquals("Обновленное название", retrievedTask.getName());
@@ -243,7 +236,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(NOT_ACCEPTABLE, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.NOT_ACCEPTABLE.getCode()), response.statusCode());
             System.out.println("Задача не обновлена из-за конфликта времени.");
             System.out.println("Тест пройден ✔");
         }
@@ -263,7 +256,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(OK, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
             assertTrue(manager.getAllTasks().isEmpty());
             System.out.println("Задача успешно удалена.");
             System.out.println("Тест пройден ✔");
@@ -283,7 +276,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(OK, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
             assertTrue(manager.getAllTasks().isEmpty());
             System.out.println("Все задачи успешно удалены.");
             System.out.println("Тест пройден ✔");
@@ -311,7 +304,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(historyRequest, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(OK, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
             Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
             List<Task> history = gson.fromJson(response.body(), listType);
@@ -337,7 +330,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(OK, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.OK.getCode()), response.statusCode());
 
             Type listType = new TypeToken<ArrayList<Task>>(){}.getType();
             List<Task> prioritizedTasks = gson.fromJson(response.body(), listType);
@@ -390,7 +383,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(METHOD_NOT_ALLOWED, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), response.statusCode());
             System.out.println("Сервер вернул ошибку при использовании не поддерживаемого метода.");
             System.out.println("Тест пройден ✔");
         }
@@ -406,7 +399,7 @@ public class HttpTaskManagerTasksTest {
 
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-            assertEquals(INTERNAL_SERVER_ERROR, response.statusCode());
+            assertEquals(Integer.parseInt(HttpStatus.INTERNAL_SERVER_ERROR.getCode()), response.statusCode());
             System.out.println("Сервер вернул внутреннюю ошибку при неверном формате JSON.");
             System.out.println("Тест пройден ✔");
         }

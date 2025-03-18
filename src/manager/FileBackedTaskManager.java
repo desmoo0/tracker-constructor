@@ -156,7 +156,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskStatus status = parts[3].equals("null") ? TaskStatus.NEW : TaskStatus.valueOf(parts[3]);
         String description = parts[4];
 
-        // Парсим время и продолжительность
         LocalDateTime startTime = parts[5].isEmpty() ? null : LocalDateTime.parse(parts[5]);
         Duration duration = parts[6].isEmpty() ? Duration.ZERO : Duration.ofMinutes(Long.parseLong(parts[6]));
 

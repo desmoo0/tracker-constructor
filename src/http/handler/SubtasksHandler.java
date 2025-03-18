@@ -3,6 +3,7 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import http.HttpStatus;
 import http.HttpTaskServer;
 import manager.TaskManager;
 import task.Subtask;
@@ -69,12 +70,12 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                         // Удаление всех подзадач
                         manager.deleteAllSubtasks();
                     }
-                    exchange.sendResponseHeaders(200, 0);
+                    exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.OK.getCode()), 0);
                     exchange.close();
                     break;
                 }
                 default: {
-                    exchange.sendResponseHeaders(405, 0);
+                    exchange.sendResponseHeaders(Integer.parseInt(HttpStatus.METHOD_NOT_ALLOWED.getCode()), 0);
                     exchange.close();
                 }
             }
